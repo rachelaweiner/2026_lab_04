@@ -1,7 +1,7 @@
 Lab 04 - La Quinta is Spanish for next to Denny’s, Pt. 1
 ================
-Insert your name here
-Insert date here
+Rachel Weiner
+January 5, 2026
 
 ### Load packages and data
 
@@ -14,32 +14,104 @@ library(dsbox)
 states <- read_csv("data/states.csv")
 ```
 
+Based on Mitch Hedberg joke that the hotel chain, “La Quinta” translates
+to “next to Denny’s” as these two locations are commonly clustered
+together across American towns and cities. Let’s see where this joke
+pans out according to the data.
+
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here. Add code
-chunks as needed. Don’t forget to label your code chunk. Do not use
-spaces in code chunk labels.
+Let’s start by collecting the dimensions of the denny’s data set.
+
+``` r
+nrow(dennys)
+```
+
+    ## [1] 1643
+
+``` r
+ncol(dennys)
+```
+
+    ## [1] 6
+
+There are 1643 rows in the data set which each represent a different
+Denny’s restaurant location. There are also six columns in this data set
+which each represent a different variable regarding each Denny’s
+location. The six variables include address, city, state, zip code,
+longitude and latitude.
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 1 here. Add code
-chunks as needed. Don’t forget to label your code chunk. Do not use
-spaces in code chunk labels.
+Next, let’s see about the La Quinta data set.
+
+``` r
+nrow(laquinta)
+```
+
+    ## [1] 909
+
+``` r
+ncol(laquinta)
+```
+
+    ## [1] 6
+
+There are 909 rows in this data set each representing a different La
+Quinta hotel location. There are also six columns each representing the
+same six variables as listed in the Denny’s data set. (Address, city,
+state, zip code, longitude, and latitude)
 
 ### Exercise 3
 
-…
+There are many La Quinta hotels outside of the United States including
+Canada, Mexico, China, New Zealand, Georgia, and Turkiye. This
+information is clearly listed on their website.
+
+On the otherhand, Denny’s does not clearly list any restauraunts as
+being outside of the United States and makes clear that they are
+“America’s Diner, In your Neighborhood” suggesting that they only have
+United States locations. They might have locations that are outside of
+the United States but this is not made clear via their website.
 
 ### Exercise 4
 
-…
+As the answers above were based on each of the organization’s websites,
+the data will provide a more substantive answer to the question
+regarding whether these organizations have locations outside of the
+United States.
+
+The first brainstormed idea that I came up with works with the state
+variable. I might be able to filter the data to reveal rows that did not
+have a state mentioned. This might help me to visualize which locations,
+of both companies, were not located within the United States.
 
 ### Exercise 5
 
-…
+Using the filter() function, I will find whether there are any Denny’s
+locations outside of the United States.
+
+``` r
+dennys %>%
+  filter(!(state %in% states$abbreviation))
+```
+
+    ## # A tibble: 0 × 6
+    ## # ℹ 6 variables: address <chr>, city <chr>, state <chr>, zip <chr>,
+    ## #   longitude <dbl>, latitude <dbl>
+
+Based off of this, there are no Denny’s locations outside of the United
+States from this data set.
 
 ### Exercise 6
 
-…
+Now I will add a seventh variable to the Dennys data set to reflect the
+country in which each restaurant is located, which is the United States
+for all locations.
+
+``` r
+dennys <- dennys %>%
+  mutate(country = "United States")
+```
 
 Add exercise headings as needed.
