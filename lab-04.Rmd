@@ -74,11 +74,13 @@ dennys <- dennys %>%
 
 ### Exercise 7
 
+Next, I will do some research to find the La Quinta hotel locations that fall outside of the United States. This will help us with the next exercise.
 
 ### Exercise 8
 
-```{r}
-laquinta %>%
+Now that I have an idea and some notes regarding La Quinta locations outside of the United States, I will use the case_when function to populate this variable. 
+```{r cases}
+laquinta <- laquinta %>%
   mutate(country = case_when(
     state %in% state.abb ~ "United States",
     state %in% c("ON", "BC") ~ "Canada",
@@ -92,10 +94,43 @@ laquinta %>%
     state == "VE" ~ "Venezuela"))
 ```
 
+As there are no Denny's locations outside the United States, we are not concerned with filtering locations for that data set. La Quinta, on the other hand, does have locations outside of the United States and therefore we will need to filter this data set for only locations in the United States. 
+```{r filter}
+laquinta <- laquinta %>%
+  filter(country == "United States")
+```
 
 ### Exercise 9
 
+Now we will calculate which states have the most and fewest Denny's locations. 
+
+```{r}
+dennys %>% 
+  count(state, sort = TRUE)
+```
+
+```{r}
+dennys %>% 
+  count(state) %>%
+  arrange(n)
+```
+
+According to these data calculations, California has (by far) the most Denny's locations with 403 total locations in the state. On the other hand, Delaware has the fewest Denny's locations with a grand total of one location. This is not surprising as California is one of the largest states and Delaware is one of the smallest states, by land area. 
+
+```{r}
+dennys <- dennys %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation"))
+```
+
+This joined code allows us to learn exactly how many observations are in each state using both the "states" data frame and the "dennys" data frame.
+
 ### Exercise 10
+
+```{r}
+
+```
+
 
 ### Exercise 11
 
