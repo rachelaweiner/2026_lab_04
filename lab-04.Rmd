@@ -10,6 +10,8 @@ output: github_document
 ```{r load-packages, message = FALSE}
 library(tidyverse) 
 library(dsbox) 
+data(dennys)
+data(laquinta)
 ```
 
 ```{r load-data, message = FALSE}
@@ -22,7 +24,7 @@ Based on Mitch Hedberg joke that the hotel chain, "La Quinta" translates to "nex
 
 Let's start by collecting the dimensions of the denny's data set. 
 
-```{r count_dennys}
+```{r count_dennys_1}
 nrow(dennys)
 ncol(dennys)
 ```
@@ -104,21 +106,21 @@ laquinta <- laquinta %>%
 
 Now we will calculate which states have the most and fewest Denny's locations. 
 
-```{r}
+```{r count_dennys}
 dennys %>% 
   count(state, sort = TRUE)
+data(dennys)
 ```
 
-```{r}
-dennys %>% 
-  count(state) %>%
-  arrange(n)
+```{r arrange_dennys}
+dennys2 <- dennys %>% 
+  count(state)
 ```
 
 According to these data calculations, California has (by far) the most Denny's locations with 403 total locations in the state. On the other hand, Delaware has the fewest Denny's locations with a grand total of one location. This is not surprising as California is one of the largest states and Delaware is one of the smallest states, by land area. 
 
-```{r}
-dennys <- dennys %>%
+```{r join_datasets}
+dennys2 <- dennys2 %>%
   count(state) %>%
   inner_join(states, by = c("state" = "abbreviation"))
 ```
@@ -127,12 +129,99 @@ This joined code allows us to learn exactly how many observations are in each st
 
 ### Exercise 10
 
-```{r}
+Now that we have joined the two data sets, we are interested in learning which state has the most Dennys location per 1000 square miles. 
 
+```{r density_dennys}
+dennys2 <- dennys2 %>%
+  mutate(density_per_1000 = (n / area) * 1000) %>%
+  arrange(desc(density_per_1000)) %>%
+  print()
+```
+According to our data output. Washington D.C. has the greatest number of Dennys locations per 1000 square miles with 2 restaurants spanning 68.34 square miles.
+
+On to La Quinta locations!
+
+```{r join_laquinta}
+laquinta2 <- laquinta %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation"))
 ```
 
+```{r density_laquinta}
+laquinta2 <- laquinta2 %>%
+  mutate(density_per_1000 = (n / area) * 1000) %>%
+  arrange(desc(density_per_1000)) %>%
+  print()
+```
+Rhode Island is home to the most La Quinta locations per 1000 square miles with one location across 1545 square miles. 
+
+Next, we will do some final code to create a scatterplot of all Dennys restaraunt locations and all La Quinta hotel locations within the United States. 
+
+```{r}
+dennys <- dennys %>%
+  mutate(establishment = "Denny's")
+laquinta <- laquinta %>%
+  mutate(establishment = "La Quinta")
+```
+
+```{r}
+dn_lq <- bind_rows(dennys, laquinta)
+```
+
+```{r combinding_datasets}
+dn_lq %>%
+  ggplot(dn_lq, mapping = aes(
+  x = longitude,
+  y = latitude,
+  color = establishment
+)) +
+  geom_point()
+```
+
+As we have plotted longitude and latitude, we are able to clearly visualize both company locations on a map-like visualization, how cool!?
 
 ### Exercise 11
 
+Let us see about North Carolina locations. 
+
+```{r nc_locations}
+dn_lq_nc <- dn_lq %>%
+  filter(state == "NC")
+```
+
+```{r nc_map}
+dn_lq_nc%>%
+  ggplot(dn_lq, mapping = aes(
+  x = longitude,
+  y = latitude,
+  color = establishment
+)) +
+  geom_point(alpha = .5)
+```
+
+This visualization graphs only the North Carolina Denny's and La Quinta locations. Visually, Mitch Hedberg's joke does not appear to hold as many of the Denny's locations and most of the La Quinta locations do not cluster in the same locations on the graph and are largely stand alone. 
+
 ### Exercise 12
 
+How about Texas?
+
+```{r tx_locations}
+dn_lq_tx <- dn_lq %>%
+  filter(state == "TX")
+```
+
+```{r tx_map}
+dn_lq_tx%>%
+  ggplot(dn_lq, mapping = aes(
+  x = longitude,
+  y = latitude,
+  color = establishment
+)) +
+  geom_point(alpha = .5)
+```
+
+According to this data visualization of Texas Denny's and La Quinta locations, Mitch Hedberg's joke does appear to hold as most Denny's and La Quinta locations do cluster around each other. 
+
+Maybe the joke holds true depending on the state that you are in!
+
+Thank you!

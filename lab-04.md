@@ -8,6 +8,8 @@ January 5, 2026
 ``` r
 library(tidyverse) 
 library(dsbox) 
+data(dennys)
+data(laquinta)
 ```
 
 ``` r
@@ -178,25 +180,13 @@ dennys %>%
     ## # ℹ 41 more rows
 
 ``` r
-dennys %>% 
-  count(state) %>%
-  arrange(n)
+data(dennys)
 ```
 
-    ## # A tibble: 51 × 2
-    ##    state     n
-    ##    <chr> <int>
-    ##  1 DE        1
-    ##  2 DC        2
-    ##  3 VT        2
-    ##  4 AK        3
-    ##  5 IA        3
-    ##  6 NH        3
-    ##  7 SD        3
-    ##  8 WV        3
-    ##  9 LA        4
-    ## 10 MT        4
-    ## # ℹ 41 more rows
+``` r
+dennys2 <- dennys %>% 
+  count(state)
+```
 
 According to these data calculations, California has (by far) the most
 Denny’s locations with 403 total locations in the state. On the other
@@ -205,7 +195,7 @@ one location. This is not surprising as California is one of the largest
 states and Delaware is one of the smallest states, by land area.
 
 ``` r
-dennys <- dennys %>%
+dennys2 <- dennys2 %>%
   count(state) %>%
   inner_join(states, by = c("state" = "abbreviation"))
 ```
@@ -216,6 +206,149 @@ frame.
 
 ### Exercise 10
 
+Now that we have joined the two data sets, we are interested in learning
+which state has the most Dennys location per 1000 square miles.
+
+``` r
+dennys2 <- dennys2 %>%
+  mutate(density_per_1000 = (n / area) * 1000) %>%
+  arrange(desc(density_per_1000)) %>%
+  print()
+```
+
+    ## # A tibble: 51 × 5
+    ##    state     n name                    area density_per_1000
+    ##    <chr> <int> <chr>                  <dbl>            <dbl>
+    ##  1 DC        1 District of Columbia    68.3          14.6   
+    ##  2 RI        1 Rhode Island          1545.            0.647 
+    ##  3 DE        1 Delaware              2489.            0.402 
+    ##  4 CT        1 Connecticut           5543.            0.180 
+    ##  5 NJ        1 New Jersey            8723.            0.115 
+    ##  6 NH        1 New Hampshire         9349.            0.107 
+    ##  7 VT        1 Vermont               9616.            0.104 
+    ##  8 MA        1 Massachusetts        10554.            0.0947
+    ##  9 HI        1 Hawaii               10932.            0.0915
+    ## 10 MD        1 Maryland             12406.            0.0806
+    ## # ℹ 41 more rows
+
+According to our data output. Washington D.C. has the greatest number of
+Dennys locations per 1000 square miles with 2 restaurants spanning 68.34
+square miles.
+
+On to La Quinta locations!
+
+``` r
+laquinta2 <- laquinta %>%
+  count(state) %>%
+  inner_join(states, by = c("state" = "abbreviation"))
+```
+
+``` r
+laquinta2 <- laquinta2 %>%
+  mutate(density_per_1000 = (n / area) * 1000) %>%
+  arrange(desc(density_per_1000)) %>%
+  print()
+```
+
+    ## # A tibble: 48 × 5
+    ##    state     n name             area density_per_1000
+    ##    <chr> <int> <chr>           <dbl>            <dbl>
+    ##  1 RI        2 Rhode Island    1545.            1.29 
+    ##  2 FL       74 Florida        65758.            1.13 
+    ##  3 CT        6 Connecticut     5543.            1.08 
+    ##  4 MD       13 Maryland       12406.            1.05 
+    ##  5 TX      237 Texas         268596.            0.882
+    ##  6 TN       30 Tennessee      42144.            0.712
+    ##  7 GA       41 Georgia        59425.            0.690
+    ##  8 NJ        5 New Jersey      8723.            0.573
+    ##  9 MA        6 Massachusetts  10554.            0.568
+    ## 10 LA       28 Louisiana      52378.            0.535
+    ## # ℹ 38 more rows
+
+Rhode Island is home to the most La Quinta locations per 1000 square
+miles with one location across 1545 square miles.
+
+Next, we will do some final code to create a scatterplot of all Dennys
+restaraunt locations and all La Quinta hotel locations within the United
+States.
+
+``` r
+dennys <- dennys %>%
+  mutate(establishment = "Denny's")
+laquinta <- laquinta %>%
+  mutate(establishment = "La Quinta")
+```
+
+``` r
+dn_lq <- bind_rows(dennys, laquinta)
+```
+
+``` r
+dn_lq %>%
+  ggplot(dn_lq, mapping = aes(
+  x = longitude,
+  y = latitude,
+  color = establishment
+)) +
+  geom_point()
+```
+
+![](lab-04_files/figure-gfm/combinding_datasets-1.png)<!-- -->
+
+As we have plotted longitude and latitude, we are able to clearly
+visualize both company locations on a map-like visualization, how cool!?
+
 ### Exercise 11
 
+Let us see about North Carolina locations.
+
+``` r
+dn_lq_nc <- dn_lq %>%
+  filter(state == "NC")
+```
+
+``` r
+dn_lq_nc%>%
+  ggplot(dn_lq, mapping = aes(
+  x = longitude,
+  y = latitude,
+  color = establishment
+)) +
+  geom_point(alpha = .5)
+```
+
+![](lab-04_files/figure-gfm/nc_map-1.png)<!-- -->
+
+This visualization graphs only the North Carolina Denny’s and La Quinta
+locations. Visually, Mitch Hedberg’s joke does not appear to hold as
+many of the Denny’s locations and most of the La Quinta locations do not
+cluster in the same locations on the graph and are largely stand alone.
+
 ### Exercise 12
+
+How about Texas?
+
+``` r
+dn_lq_tx <- dn_lq %>%
+  filter(state == "TX")
+```
+
+``` r
+dn_lq_tx%>%
+  ggplot(dn_lq, mapping = aes(
+  x = longitude,
+  y = latitude,
+  color = establishment
+)) +
+  geom_point(alpha = .5)
+```
+
+![](lab-04_files/figure-gfm/tx_map-1.png)<!-- -->
+
+According to this data visualization of Texas Denny’s and La Quinta
+locations, Mitch Hedberg’s joke does appear to hold as most Denny’s and
+La Quinta locations do cluster around each other.
+
+Maybe the joke holds true depending on the state that you are in!
+
+Thank you!
